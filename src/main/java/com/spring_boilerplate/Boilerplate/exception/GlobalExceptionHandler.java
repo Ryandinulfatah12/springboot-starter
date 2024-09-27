@@ -15,20 +15,30 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Handle validation errors (e.g., @Valid)
+    @ExceptionHandler(CustomException.class)
+    public ResponseEntity<ApiResponse<Object>> handleCustomException(CustomException ex) {
+        ApiResponse<Object> response = new ApiResponse<>(
+                ex.getStatusCode(),                  // Status Code Custom
+                false,                               // Success flag
+                ex.getMessage(),                     // Custom Message
+                null,                                // Data null
+                ex.getErrors()                       // Errors Map
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.valueOf(ex.getStatusCode()));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ApiResponse<Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
 
-        // Ambil semua field error dan simpan dalam map
         ex.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
 
-        // Return ApiResponse dengan multiple errors dan status code 400
         ApiResponse<Object> response = new ApiResponse<>(400, false, "Validation error", null, errors);
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
