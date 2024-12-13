@@ -2,6 +2,7 @@ package com.spring_boilerplate.Boilerplate.controller.user;
 
 import com.spring_boilerplate.Boilerplate.dto.UserDTO;
 import com.spring_boilerplate.Boilerplate.entity.User;
+import com.spring_boilerplate.Boilerplate.service.AuthenticationService;
 import com.spring_boilerplate.Boilerplate.service.UserService;
 import com.spring_boilerplate.Boilerplate.util.ApiResponse;
 import jakarta.validation.Valid;
@@ -14,9 +15,12 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private AuthenticationService authenticationService;
+
     @PostMapping
     public ApiResponse<User> createUser(@Valid @RequestBody UserDTO userDTO) {
-        User user = userService.createUser(userDTO);
+        User user = authenticationService.signup(userDTO);
         return new ApiResponse<>(201, true, "User created successfully", user, null);
     }
 }

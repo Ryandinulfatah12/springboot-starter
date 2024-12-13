@@ -8,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -61,5 +62,25 @@ public class GlobalExceptionHandler {
         response.put("error", "An unexpected error occurred");
         response.put("details", ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    // Handle Unauthorized (401)
+    @ExceptionHandler(HttpClientErrorException.Unauthorized.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<Map<String, String>> handleUnauthorizedException(HttpClientErrorException.Unauthorized ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", "Unauthorized");
+        response.put("details", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
+    // Handle Forbidden (403)
+    @ExceptionHandler(HttpClientErrorException.Forbidden.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<Map<String, String>> handleForbiddenException(HttpClientErrorException.Forbidden ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", "Forbidden");
+        response.put("details", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 }
